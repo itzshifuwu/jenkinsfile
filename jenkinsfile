@@ -1,18 +1,15 @@
 pipeline {
   agent any
-  parameters {
-    booleanParam(name: 'RUN_TESTS', defaultValue: true, description: 'Run tests?')
+  environment {
+    NODE_VERSION = '14'
+    MY_VAR = 'shifa_value'
   }
   stages {
-    stage('Build') { steps { echo 'Building..' } }
-    stage('Test') {
-      when {
-        expression { return params.RUN_TESTS == true }
-      }
+    stage('Build') {
       steps {
-        echo 'Testing..'
+        echo "Using NODE_VERSION = ${env.NODE_VERSION}"
+        echo "MY_VAR = ${env.MY_VAR}"
       }
     }
-    stage('Deploy') { steps { echo 'Deploying..' } }
   }
 }
