@@ -1,15 +1,47 @@
 pipeline {
   agent any
+  parameters {
+    booleanParam(name: 'RUN_TESTS', defaultValue: true, description: 'Run tests?')
+    string(name: 'DEPLOY_ENV', defaultValue: 'staging', description: 'Deploy environment')
+  }
+  environment {
+    APP_NAME = 'my-app'
+    NODE_VERSION = '14'
+  }
   tools {
-    maven 'M3'   // name must match the entry in Global Tool Configuration
-    jdk 'jdk11'  // if defined in tools
+    maven 'M3'         // match name in Global Tool Configuration
+    jdk 'jdk11'        // match name if defined
   }
   stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
+    }
     stage('Build') {
       steps {
-        bat 'mvn -v'
+        echo "Building ${env.APP_NAME}"
         bat 'mvn -B -DskipTests package'
       }
     }
+    stage('Test') {
+      when {
+        expression { return params.RUN_TESTS }
+      }
+      steps {
+        bat 'mvn test'
+      }
+    }
+    stage('Deploy') {
+      steps {
+        echo "Deploying to ${params.DEPLOY_ENV}"
+        // add real deploy steps here
+      }
+    }
+  }
+  post {
+    success { echo 'SUCCESS: Notifying team...' }
+    failure { echo 'FAIL: See logs in console output.' }
+    always { echo 'CLEANUP: Removing temporary resources' }
   }
 }
