@@ -1,14 +1,14 @@
 pipeline {
   agent any
-  environment {
-    NODE_VERSION = '14'
-    MY_VAR = 'shifa_value'
+  tools {
+    maven 'M3'   // name must match the entry in Global Tool Configuration
+    jdk 'jdk11'  // if defined in tools
   }
   stages {
     stage('Build') {
       steps {
-        echo "Using NODE_VERSION = ${env.NODE_VERSION}"
-        echo "MY_VAR = ${env.MY_VAR}"
+        sh 'mvn -v'
+        sh 'mvn -B -DskipTests package'
       }
     }
   }
